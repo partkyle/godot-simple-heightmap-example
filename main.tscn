@@ -1,0 +1,86 @@
+[gd_scene load_steps=16 format=3 uid="uid://cb4sam8d2pvrb"]
+
+[ext_resource type="Shader" path="res://height.gdshader" id="1_e2p4g"]
+[ext_resource type="Script" path="res://character_body_3d.gd" id="2_7rocf"]
+[ext_resource type="Script" path="res://heightmap.gd" id="2_862sp"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_h7c4q"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_7h4xu"]
+sky_material = SubResource("ProceduralSkyMaterial_h7c4q")
+
+[sub_resource type="Environment" id="Environment_lnchf"]
+background_mode = 2
+sky = SubResource("Sky_7h4xu")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="Gradient" id="Gradient_u0u3o"]
+offsets = PackedFloat32Array(0, 0.164021, 0.756614, 0.89418, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.356863, 0.368627, 0.227451, 1, 0.172549, 0.541176, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_k4bgf"]
+gradient = SubResource("Gradient_u0u3o")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hxen6"]
+render_priority = 0
+shader = ExtResource("1_e2p4g")
+shader_parameter/input_color = Color(0.356863, 0.368627, 0.227451, 1)
+shader_parameter/max_height = 1.0
+shader_parameter/gradient_texture = SubResource("GradientTexture1D_k4bgf")
+
+[sub_resource type="QuadMesh" id="QuadMesh_s1h0r"]
+material = SubResource("ShaderMaterial_hxen6")
+size = Vector2(512, 512)
+subdivide_width = 512
+subdivide_depth = 512
+orientation = 1
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_s87jp"]
+noise_type = 3
+frequency = 0.0035
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_csme1"]
+noise = SubResource("FastNoiseLite_s87jp")
+
+[sub_resource type="HeightMapShape3D" id="HeightMapShape3D_5xl34"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_4gklc"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jivop"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_lnchf")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("QuadMesh_s1h0r")
+script = ExtResource("2_862sp")
+heightmap = SubResource("NoiseTexture2D_csme1")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+shape = SubResource("HeightMapShape3D_5xl34")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 0)
+floor_max_angle = 0.523599
+script = ExtResource("2_7rocf")
+rotate_speed = 0.005
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D"]
+mesh = SubResource("CapsuleMesh_4gklc")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+shape = SubResource("CapsuleShape3D_jivop")
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 6, 4)
