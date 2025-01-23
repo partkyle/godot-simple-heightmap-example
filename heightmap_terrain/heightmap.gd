@@ -1,5 +1,5 @@
+@tool
 extends MeshInstance3D
-
 
 @export var max_height := 100.0
 @export var heightmap : Texture2D
@@ -14,7 +14,7 @@ func _ready() -> void:
 	# convert the image format to be compatible with the HeightMapShape3D
 	heightmap.get_image().convert(Image.FORMAT_RF)
 
-	mesh.surface_get_material(0).set('shader_parameter/noise', heightmap)
+	#mesh.surface_get_material(0).set('shader_parameter/heightmap', heightmap)
 	mesh.surface_get_material(0).set('shader_parameter/max_height', max_height)
 
 	var shape = HeightMapShape3D.new()

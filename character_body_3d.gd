@@ -4,6 +4,7 @@ extends CharacterBody3D
 const SPEED = 5.0
 const SPRINT_SPEED = 3.0
 const JUMP_VELOCITY = 4.5
+@onready var spring_arm_3d: SpringArm3D = $SpringArm3D
 
 @export var rotate_speed := 0.1
 
@@ -42,3 +43,4 @@ func _physics_process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		rotate_y(-event.relative.x * rotate_speed)
+		spring_arm_3d.rotate_x(-event.relative.y * rotate_speed)
